@@ -49,21 +49,12 @@ def apply_clearance(cart)
 end
 
 def checkout(cart, coupons)
-  consolidate_cart(cart)
-  apply_coupons(cart, coupons)
-  apply_clearance(cart)
-
-  total = cart.reduce(0) do | memo, (key, value) |
-    if !memo
-      memo = value[:price][0]
-    else
-      memo += value[:price]
-    end
-    memo
+  cart = consolidate_cart(cart: cart)
+  cart_w_coupons = apply_coupons(cart: cart, coupons: coupons)
+  cart = apply_clearance(cart: cart)
+  result = 0
+  cart.each do |food, info|
+    result += (info[:price] * info[:count]).to_f
   end
-  if total >= 100
-    total = total * 0.9
-  end
-
-  return total
+  result > 100 ? result * 0.9 : result
 end
